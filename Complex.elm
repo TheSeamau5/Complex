@@ -1,5 +1,45 @@
 module Complex where
-import MathUtils (..)
+
+{-| A library for complex numbers. The complex numbers
+are represented by a record with two Float fields "real"
+and "imaginary".
+
+#Types
+@docs Complex
+
+#Creating Complex numbers
+The simplest way to create a complex number is by using
+type constructor for the Complex type. To create the
+complex number 2 + 3i :
+
+    x = Complex 2 3
+
+The first argument sets the real part and the second sets
+the imaginary part.
+
+#Conversions
+@docs toComplex, toImaginary, fromTuple, toTuple, toPolar
+
+#Common values
+@docs i, j
+
+#Common Operations on Complex Numbers
+@docs cAdd, cSub, cNeg, cMul, cDiv, cScaleBy, cSqrt
+
+#Conjugate
+@docs conjugate
+
+#Properties of Complex Numbers
+@docs cAbs, cArg
+
+#Exponentiation
+@docs cExp, cPow, cLn
+
+#Trigonometric Functions
+@docs cSin, cCos, cTan, cSec, cCsc, cCot
+
+-}
+
 
 {-| The Complex type. Used to represent a complex number
 with a real part and an imaginary part.
@@ -100,15 +140,7 @@ real axis.
 
 -}
 cArg : Complex -> Float
-cArg z = 
-  let a = z.real
-      b = z.imaginary
-  in if | a > 0            -> atan2 b a
-        | a < 0  && b >= 0 -> atan2 b a + pi
-        | a < 0  && b < 0  -> atan2 b a - pi 
-        | a == 0 && b > 0  -> pi / 2
-        | a == 0 && b < 0  -> -pi / 2
-        | otherwise        -> b / a  -- NaN
+cArg z = atan2 z.imaginary z.real 
 
 {-| Returns the principal square root of a complex number
 
@@ -117,7 +149,10 @@ cArg z =
 -}
 cSqrt : Complex -> Complex
 cSqrt z = 
-  let a = z.real
+  let signum x =  if | x == 0    ->  0
+                     | x <  0    -> -1
+                     | otherwise ->  1
+      a = z.real
       b = z.imaginary
       c = sqrt ((a + sqrt (a * a + b * b)) / 2)
       d = (signum b) * sqrt ((-a + sqrt (a * a + b * b)) / 2)
@@ -126,8 +161,8 @@ cSqrt z =
 
 {-| Return the natural logarithm of a complex number
 -}
-cLog : Complex -> Complex 
-cLog z = Complex (logBase e (cAbs z)) (cArg z)
+cLn : Complex -> Complex 
+cLn z = Complex (logBase e (cAbs z)) (cArg z)
 
 {-| Return e raised to a complex power
       
@@ -137,15 +172,15 @@ cLog z = Complex (logBase e (cAbs z)) (cArg z)
 -}
 cExp : Complex -> Complex
 cExp z = 
-    let a = z.real
-        b = z.imaginary
-    in Complex (e^a * cos b) (e^a * sin b)
+  let a = z.real
+      b = z.imaginary
+  in Complex (e^a * cos b) (e^a * sin b)
 
 {-| Return the result of raising a complex number to a 
 complex power
 -}
 cPow : Complex -> Complex -> Complex
-cPow base exponent =  cExp ( exponent `cMul` (cLog base) )
+cPow base exponent =  cExp ( exponent `cMul` (cLn base) )
 
 {-| Returns the sine of a complex number
 -}
@@ -195,10 +230,32 @@ toComplex x = Complex x 0
 {-| Converts a Float to the Complex type by setting the
 imaginary part.
 
-      toComplex 3 == Complex 0 3
+      toImaginary 3 == Complex 0 3
 -}
 toImaginary : Float -> Complex
 toImaginary x = Complex 0 x
+
+{-| Converts a 2-tuple of Floats to a complex number
+      
+      fromTuple (2,3) == Complex 2 3
+-}
+fromTuple : (Float , Float) -> Complex
+fromTuple (real , imaginary) = Complex real imaginary
+
+{-| Converts a Complex number to a 2-tuple of Floats
+      
+      toTuple (Complex 1 8) == (1,8)
+-}
+toTuple : Complex -> (Float, Float)
+toTuple z = (z.real , z.imaginary)
+
+{-| Converts a Complex number to a 2-tuple of Floats
+in polar form
+      
+      toPolar i == (1 , pi / 2)
+-}
+toPolar : Complex -> (Float , Float)
+toPolar z = (cAbs z , cArg z)
 
 {-| Imaginary number
 -}
