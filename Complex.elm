@@ -18,7 +18,7 @@ cMul z w =
   let a = z.real
       b = z.imaginary
       c = w.real
-      d = z.imaginary
+      d = w.imaginary
   in Complex (a * c - b * d)
              (b * c + a * d)
 
@@ -49,8 +49,8 @@ cArg z =
   in if | a > 0            -> atan2 b a
         | a < 0  && b >= 0 -> atan2 b a + pi
         | a < 0  && b < 0  -> atan2 b a - pi 
-        | a == 0 && y > 0  -> pi / 2
-        | a == 0 && y < 0  -> -pi / 2
+        | a == 0 && b > 0  -> pi / 2
+        | a == 0 && b < 0  -> -pi / 2
         | otherwise        -> b / a  -- NaN
 
 cSqrt : Complex -> Complex
@@ -71,8 +71,8 @@ cExp z =
         b = z.imaginary
     in Complex (e^a * cos b) (e^a * sin b)
 
-cPow : Complex -> Complex 
-cPow base exponent =  cExp ( base `cMul` (cLog exponent) )
+cPow : Complex -> Complex -> Complex
+cPow base exponent =  cExp ( exponent `cMul` (cLog base) )
 
 toComplex : Float -> Complex 
 toComplex x = Complex x 0
