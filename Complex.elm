@@ -46,6 +46,15 @@ cMul z w =
   in Complex (a * c - b * d)
              (b * c + a * d)
 
+{-| Scales a complex number by some Float
+(i.e. multiplies a real number by a complex number)
+
+      cScaleBy 2 (Complex 1 3) == Complex 2 6
+
+-}
+cScaleBy : Float -> Complex -> Complex
+cScaleBy n z = Complex (z.real * n) (z.imaginary * n)
+
 {-| Divides two complex numbers and returns the result
 
       (Complex 1 2) `cDiv` (Complex 2 2) == Complex 0.75 0.25 
@@ -137,6 +146,42 @@ complex power
 -}
 cPow : Complex -> Complex -> Complex
 cPow base exponent =  cExp ( exponent `cMul` (cLog base) )
+
+{-| Returns the sine of a complex number
+-}
+cSin : Complex -> Complex
+cSin z = 
+  let iz = i `cMul` z
+      niz = cNeg iz
+  in cExp iz `cSub` cExp niz `cDiv` cScaleBy 2 i
+
+{-| Returns the cosine of a complex number
+-}
+cCos : Complex -> Complex
+cCos z = 
+  let iz = i `cMul` z
+      niz = cNeg iz
+  in cScaleBy 0.5 (cExp iz `cAdd` cExp niz)
+
+{-| Returns the tangent of a complex number
+-}
+cTan : Complex -> Complex
+cTan z = cSin z `cDiv` cCos z 
+
+{-| Returns the secant of a complex number
+-}
+cSec : Complex -> Complex
+cSec z = toComplex 1 `cDiv` cCos z
+
+{-| Returns the cosecant of a complex number
+-}
+cCsc : Complex -> Complex
+cCsc z = toComplex 1 `cDiv` cSin z
+
+{-| Returns the cotangent of a complex number
+-}
+cCot : Complex -> Complex
+cCot z = toComplex 1 `cDiv` cTan z
 
 {-| Converts a Float to the Complex type by setting the 
 real part.
